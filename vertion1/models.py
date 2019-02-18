@@ -45,6 +45,8 @@ class User(AbstractBaseUser):
     # email
     email = models.EmailField(unique=True)
 
+    password = models.CharField(max_length=30)
+
     objects = MyUserManager()
 
     # creation date
