@@ -12,6 +12,10 @@ def register(request):
         information  = {"result":"true","information":"注册成功"}
         return HttpResponse(json.dumps(information),content_type='application/json', charset='utf-8')
 
+
+
+
+
 '''
 登录
 

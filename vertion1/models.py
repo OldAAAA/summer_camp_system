@@ -1,7 +1,4 @@
-from datetime import time
-
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
-from django.db import models
 
 # Create your models here.
 
@@ -81,9 +78,33 @@ class User_info(models.Model):
               ('m','male')}
 
     email = models.ForeignKey(User,on_delete=models.CASCADE,default='')
-    First_Name = models.CharField(max_length=30,null = False)
-    Last_Name = models.CharField(max_length=30,null = False)
-    Chinese_Name = models.CharField(max_length=30,null=False)
-    Sex = models.CharField(max_length=1,choices=sex_list,null = False)
-    Nationality = models.CharField(max_length=30,null = False)
-    # Date_Of_Birth = models.DateTimeField(null = False)
+    First_Name = models.CharField(max_length=30,null = False,default = 'null')
+    Last_Name = models.CharField(max_length=30,null = False,default = 'null')
+    Chinese_Name = models.CharField(max_length=30,null=False,default = 'null')
+    Sex = models.CharField(max_length=1,choices=sex_list,null = False,default = 'null')
+    Nationality = models.CharField(max_length=30,null = False,default = 'null')
+    Date_Of_Birth = models.CharField(max_length = 30,null = False,default = 'null')
+    Place_of_Birth = models.CharField(max_length = 30,null = False,default = 'null')
+    Mather_Tongue = models.CharField(max_length=30, null=False,default = 'null')
+    Religion = models.CharField(max_length=30, null=False,default = 'null')
+    Health_Condition = models.CharField(max_length=100, null=False,default = 'null')
+    Name_Of_Institution = models.CharField(max_length=30, null=False,default = 'null')
+    Highest_Education = models.CharField(max_length=30, null=False,default = 'null')
+    Email = models.EmailField(null=False,default = 'null')
+    Phone_Number = models.CharField(max_length=30, null=False,default = 'null')
+    Emergency_Name = models.CharField(max_length=30, null=False,default = 'null')
+    Emergency_Relationship = models.CharField(max_length=30, null=False,default = 'null')
+    Emergency_Phone = models.CharField(max_length=30, null=False,default = 'null')
+    Emergency_email = models.CharField(max_length=30, null=True)
+    Name_Of_Sponsor = models.CharField(max_length=30, null=False,default = 'null')
+    Sponsor_Relationship = models.CharField(max_length=30, null=False,default = 'null')
+    Sponsor_Phone = models.CharField(max_length=30, null=False,default = 'null')
+    Sponsor_Email = models.CharField(max_length=30, null=True)
+    Mail_Recipient = models.CharField(max_length=30, null=False,default = 'null')
+    Mail_Phone = models.CharField(max_length=30, null=False,default = 'null')
+    Mail_Address = models.CharField(max_length=30, null=False,default = 'null')
+    Mail_City = models.CharField(max_length=30, null=False,default = 'null')
+    Mail_Country = models.CharField(max_length=30, null=False,default = 'null')
+    Mail_Postcode = models.CharField(max_length=30, null=False,default = 'null')
+
+
