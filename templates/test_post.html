@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>样例网页</title>
+</head>
+<body>
+    <h1>测试向服务器发送消息</h1>
+
+    E-mail: <input type="email" id="user_email" /><br />
+        <button onclick="send()">发送</button>
+
+    <h1>服务器的返回的数据</h1>
+    <h2 id = "returns"></h2>
+
+    <script src="/static/js/jquery.min.js"></script>
+    <script >
+        function send(){
+            var user_email = $("#user_email").val()
+            $.ajax({
+                url: "test_post",
+                data: { email:user_email},
+                dataType: "json",
+                type:"POST",
+                success: function (result) {
+                    var a = result.result
+                    $("#returns").html(result.result)
+                }
+            })
+		}
+
+    </script>
+
+</body>
+
+</html>

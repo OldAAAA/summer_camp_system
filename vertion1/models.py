@@ -106,5 +106,5 @@ class User_info(models.Model):
     Mail_City = models.CharField(max_length=30, null=False,default = 'null')
     Mail_Country = models.CharField(max_length=30, null=False,default = 'null')
     Mail_Postcode = models.CharField(max_length=30, null=False,default = 'null')
-
+    submit_status = models.CharField(max_length=30, null=False,default = 'null')
 

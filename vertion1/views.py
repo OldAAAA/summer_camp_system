@@ -1,7 +1,7 @@
 import json
-
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from vertion1 import models
 
 # Create your views here.
 
@@ -40,3 +40,155 @@ def register(request):
         返回的是注册的结果{"result":"true","infomation":""}
         renturn HttpResponse()
 '''
+
+
+
+
+'''
+前端返回的json数据
+{
+    "email":"1@qq.com"
+    "First_Name":"Long"
+    "Last_Name" :"Qiwei"
+    "Chinese_Name" : "龙淇伟"
+    "Sex" : "f"
+    "Nationality" : "China"
+    "Date_Of_Birth" : "1998.8.15"
+    "Place_of_Birth" : "jiangxi jian"
+    "Mather_Tongue" : "Chinese"
+    "Religion" : "无"
+    "Health_Condition" : "Good"
+    "Name_Of_Institution" : "Beijing JiaoTong University"
+    "Highest_Education" : "phd"
+    "Email" : "1@qq.com"
+    "Phone_Number" : "18801119875"
+    "Emergency_Name" : "lalaal"
+    "Emergency_Relationship" : "lala"
+    "Emergency_Phone" : "ads"
+    "Emergency_email" : "adsd"
+    "Name_Of_Sponsor" : "guojiajijingwei"
+    "Sponsor_Relationship" : "sidjisd"
+    "Sponsor_Phone" : "sdfsf"
+    "Sponsor_Email" : "23r"
+    "Mail_Recipient" : "12323"
+    "Mail_Phone" : "123213"
+    "Mail_Address" : "1234324"
+    "Mail_City" : "12323132"
+    "Mail_Country" : "fdsfds"
+    "Mail_Postcode" :"123123"
+}
+'''
+
+def submit(request):
+    if request.method == "GET":
+        return render(request, "test.html", {"test_info": "提交详细信息界面", "result": "返回成功"})
+    if request.method == "POST":
+        #返回的信息
+        information = {"result": "true", "information": "注册成功"}
+        #拿到提交的表单
+        form  = request.POST
+        # form = {
+        #         "First_Name":"Long",
+        #         "Last_Name" :"Qiwei",
+        #         "Chinese_Name" : "龙淇伟",
+        #         "Sex" : "f",
+        #         "Nationality" : "China",
+        #         "Date_Of_Birth" : "1998.8.15",
+        #         "Place_of_Birth" : "jiangxi jian",
+        #         "Mather_Tongue" : "Chinese",
+        #         "Religion" : "无",
+        #         "Health_Condition" : "Good",
+        #         "Name_Of_Institution" : "Beijing JiaoTong University",
+        #         "Highest_Education" : "phd",
+        #         "Email" : "1@qq.com",
+        #         "Phone_Number" : "18801119875",
+        #         "Emergency_Name" : "lalaal",
+        #         "Emergency_Relationship" : "lala",
+        #         "Emergency_Phone" : "ads",
+        #         "Emergency_email" : "adsd",
+        #         "Name_Of_Sponsor" : "guojiajijingwei",
+        #         "Sponsor_Relationship" : "sidjisd",
+        #         "Sponsor_Phone" : "sdfsf",
+        #         "Sponsor_Email" : "23r",
+        #         "Mail_Recipient" : "12323",
+        #         "Mail_Phone" : "123213",
+        #         "Mail_Address" : "1234324",
+        #         "Mail_City" : "12323132",
+        #         "Mail_Country" : "fdsfds",
+        #         "Mail_Postcode" :"123123",
+        #         }
+
+        #判断是否所有的信息都填写了
+        for element in form:
+            if form[element] == "":
+                information["result"]  = "False"
+                information["information"] = "填写必填信息"
+                return HttpResponse(json.dumps(information), content_type='application/json', charset='utf-8')
+
+
+        user =models.User.objects.get(email = "1@qq.com")
+        form["email"] = user
+        form["submit_status"] = "Pending approval"
+        s =models.User_info.objects.create(**form)
+        s.save()
+        return HttpResponse(json.dumps(information), content_type='application/json', charset='utf-8')
+
+
+def changeinfo(request):
+    # 返回的信息
+    information = {"result": "true", "information": "注册成功"}
+    # 拿到提交的表单
+    form = request.POST
+    # form = {
+    #         "First_Name":"Long",
+    #         "Last_Name" :"Qiwei",
+    #         "Chinese_Name" : "龙淇伟",
+    #         "Sex" : "f",
+    #         "Nationality" : "China",
+    #         "Date_Of_Birth" : "1998.8.15",
+    #         "Place_of_Birth" : "jiangxi jian",
+    #         "Mather_Tongue" : "Chinese",
+    #         "Religion" : "无",
+    #         "Health_Condition" : "Good",
+    #         "Name_Of_Institution" : "Beijing JiaoTong University",
+    #         "Highest_Education" : "phd",
+    #         "Email" : "1@qq.com",
+    #         "Phone_Number" : "18801119875",
+    #         "Emergency_Name" : "lalaal",
+    #         "Emergency_Relationship" : "lala",
+    #         "Emergency_Phone" : "ads",
+    #         "Emergency_email" : "adsd",
+    #         "Name_Of_Sponsor" : "guojiajijingwei",
+    #         "Sponsor_Relationship" : "sidjisd",
+    #         "Sponsor_Phone" : "sdfsf",
+    #         "Sponsor_Email" : "23r",
+    #         "Mail_Recipient" : "12323",
+    #         "Mail_Phone" : "123213",
+    #         "Mail_Address" : "1234324",
+    #         "Mail_City" : "12323132",
+    #         "Mail_Country" : "fdsfds",
+    #         "Mail_Postcode" :"123123",
+    #         }
+
+    #获取当前的登录用户
+    user = models.User.objects.get(email="1@qq.com")
+
+    models.User_info.objects.get(email = user.email)
+    models.User_info.delete()
+
+    form["email"] = user
+    form["submit_status"] = "Pending approval"
+    s = models.User_info.objects.create(**form)
+    s.save()
+
+    return HttpResponse("这是更改页面")
+
+def test_post(request):
+    if request.method == "GET":
+        return render(request,"test_post.html")
+    else:
+        form = request.POST
+        print(request.POST)
+        info = {}
+        info["result"] = form["email"]
+        return JsonResponse(info)
