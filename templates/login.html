@@ -64,7 +64,7 @@
 						<form class="form-header" role="form" method="POST" id="#">
                             <p style="color: #ffe0c2">{{ information }}</p>
 							<div class="form-group">
-								<input class="form-control input-lg" name="email" id="email" type="email" placeholder="Email" required>
+								<input value = "{{ user }}" class="form-control input-lg" name="email" id="email" type="email" placeholder="Email" required>
 							</div>
 
 							<div class="form-group">
@@ -102,7 +102,12 @@
 	<script src="/static/js/js1/owl.carousel.min.js"></script>
 	<script>
 		new WOW().init();
+		$(document).ready(function(){
+		    {% autoescape off %}
+                {{ kill }}
+            {% endautoescape %}
+        });
 	</script>
-	<script  src="/static/js/js1/register.js"></script>
+	<script  src="/static/js/js1/regis ter.js"></script>
   </body>
 </html>
