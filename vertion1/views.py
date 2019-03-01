@@ -1,174 +1,114 @@
 import json
+from copy import copy
+
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from vertion1 import models
 
-# Create your views here.
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import authenticate
+from django.contrib import auth
+import smtplib
+from email.mime.text import MIMEText
+
+User = get_user_model()
+
+def login(request):
+    if request.method == "POST":
+        # 前端 变量名称为email_username
+        email_username = request.POST['email']
+        if(not '@' in email_username):
+            information = {"information":"User name is incorrectly formatted"}
+            return render(request, "login.html", information)
+        # 前端 变量名称为pw
+        password = request.POST['password']
+
+        hasUser =  User.objects.filter(email=email_username)
+        if len(password) < 6:
+            information = {"information": "Password is not less than six digits"}
+            return render(request, "login.html", information)
+        if hasUser:
+            user = auth.authenticate(email=email_username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                if request.user.is_admin:
+                    return redirect("/audit")
+                else:
+                    return redirect("/submit")
+            else:
+                information = {"information":"Wrong user name or password"}
+                return render(request,"login.html",information)
+        else:
+            information = {"information":"User name does not exist"}
+            return render(request, "login.html", information)
+    return render(request, 'login.html')
 
 def register(request):
-    if request.method == 'GET':
-        return render(request, "test.html",{"test_info":"登录界面","result":"返回成功"})
-    if request.method == 'POST':
-        information  = {"result":"true","information":"注册成功"}
-        return HttpResponse(json.dumps(information),content_type='application/json', charset='utf-8')
+    if request.method == "POST":
+        # 前端 变量名称为email_username
+        email = request.POST['email']
 
+        # 前端 变量名称为password
+        password = request.POST['password']
 
+        password_confirm = request.POST['password_confirm']
 
-
-
-'''
-登录
-
-1、request.method == GET
-        返回的是登录的页面
-2、request.method  == POST
-        request.form = ["username":"123","password":"123456"]
-        首先你要检查这个东西在数据库里面有没有这个用户，
-        然后密码有没有正确，如果不存在用户，information：用户名不存在,如果用户的密码输错了：第二种情况
-        返回的是登录的结果["result":"true","information":"用户名不存在/用户名或者密码错误"]
-'''
-
-
-'''
-注册
-1、request.method == GET
-        返回的是注册的页面
-        return render
-2、request.method  == POST
-        request.form = ["username":"123","password":"123456"]
-        首先检查存不存在这个用户，数据库里面找user，看有没有，如果没有：info：注册成功，如果有：info:用户名已经存在
-        返回的是注册的结果{"result":"true","infomation":""}
-        renturn HttpResponse()
-'''
-
-
-
-
-'''
-前端返回的json数据
-{
-    "email":"1@qq.com"
-    "First_Name":"Long"
-    "Last_Name" :"Qiwei"
-    "Chinese_Name" : "龙淇伟"
-    "Sex" : "f"
-    "Nationality" : "China"
-    "Date_Of_Birth" : "1998.8.15"
-    "Place_of_Birth" : "jiangxi jian"
-    "Mather_Tongue" : "Chinese"
-    "Religion" : "无"
-    "Health_Condition" : "Good"
-    "Name_Of_Institution" : "Beijing JiaoTong University"
-    "Highest_Education" : "phd"
-    "Email" : "1@qq.com"
-    "Phone_Number" : "18801119875"
-    "Emergency_Name" : "lalaal"
-    "Emergency_Relationship" : "lala"
-    "Emergency_Phone" : "ads"
-    "Emergency_email" : "adsd"
-    "Name_Of_Sponsor" : "guojiajijingwei"
-    "Sponsor_Relationship" : "sidjisd"
-    "Sponsor_Phone" : "sdfsf"
-    "Sponsor_Email" : "23r"
-    "Mail_Recipient" : "12323"
-    "Mail_Phone" : "123213"
-    "Mail_Address" : "1234324"
-    "Mail_City" : "12323132"
-    "Mail_Country" : "fdsfds"
-    "Mail_Postcode" :"123123"
-}
-'''
+        hasUser = User.objects.filter(email=email)
+        if not hasUser:  # User Exists
+            if (not '@' in email):
+                information = {"information": "There is an error in the user name format"}
+                return render(request,"register.html",information)
+            if password != password_confirm:
+                information = {"information": "Password inconsistency"}
+                return render(request,"register.html",information)
+            if len(password) < 6:
+                information = {"information": "Password is not less than six digits"}
+                return render(request,"register.html",information)
+            # insert into database
+            else:
+                information = {"information": "Registered successfully"}
+                User.objects.create_user(email=email, password=password)
+                return redirect("/login")
+        else:
+            information = {"information":"Username is already registered"}
+            return render(request,"register.html",information)
+    else:
+       return render(request, 'register.html')
 
 def submit(request):
-    if request.method == "GET":
-        return render(request, "test.html", {"test_info": "提交详细信息界面", "result": "返回成功"})
-    if request.method == "POST":
-        #返回的信息
-        information = {"result": "true", "information": "注册成功"}
-        #拿到提交的表单
-        form  = request.POST
-        # form = {
-        #         "First_Name":"Long",
-        #         "Last_Name" :"Qiwei",
-        #         "Chinese_Name" : "龙淇伟",
-        #         "Sex" : "f",
-        #         "Nationality" : "China",
-        #         "Date_Of_Birth" : "1998.8.15",
-        #         "Place_of_Birth" : "jiangxi jian",
-        #         "Mather_Tongue" : "Chinese",
-        #         "Religion" : "无",
-        #         "Health_Condition" : "Good",
-        #         "Name_Of_Institution" : "Beijing JiaoTong University",
-        #         "Highest_Education" : "phd",
-        #         "Email" : "1@qq.com",
-        #         "Phone_Number" : "18801119875",
-        #         "Emergency_Name" : "lalaal",
-        #         "Emergency_Relationship" : "lala",
-        #         "Emergency_Phone" : "ads",
-        #         "Emergency_email" : "adsd",
-        #         "Name_Of_Sponsor" : "guojiajijingwei",
-        #         "Sponsor_Relationship" : "sidjisd",
-        #         "Sponsor_Phone" : "sdfsf",
-        #         "Sponsor_Email" : "23r",
-        #         "Mail_Recipient" : "12323",
-        #         "Mail_Phone" : "123213",
-        #         "Mail_Address" : "1234324",
-        #         "Mail_City" : "12323132",
-        #         "Mail_Country" : "fdsfds",
-        #         "Mail_Postcode" :"123123",
-        #         }
+    if request.user.is_authenticated:
+        if request.method == "GET":
+            return render(request, "submit.html",{"email":request.user.email})
+        if request.method == "POST":
+            #返回的信息
+            information = {"result": "true", "information": "注册成功"}
+            #拿到提交的表单
+            form  = copy(request.POST)
+            print(form)
 
-        #判断是否所有的信息都填写了
-        for element in form:
-            if form[element] == "":
-                information["result"]  = "False"
-                information["information"] = "填写必填信息"
-                return HttpResponse(json.dumps(information), content_type='application/json', charset='utf-8')
+            # #判断是否所有的信息都填写了
+            # for element in form:
+            #     if form[element] == "":
+            #         information["result"]  = "False"
+            #         information["information"] = "填写必填信息"
+            #         return HttpResponse(json.dumps(information), content_type='application/json', charset='utf-8')
+            #
 
-
-        user =models.User.objects.get(email = "1@qq.com")
-        form["email"] = user
-        form["submit_status"] = "Pending approval"
-        s =models.User_info.objects.create(**form)
-        s.save()
-        return HttpResponse(json.dumps(information), content_type='application/json', charset='utf-8')
-
+            form["email"] = request.user.email
+            form["submit_status"] = "Pending approval"
+            form["sex"] = "f"
+            s =models.User_info.objects.create(**form)
+            s.save()
+            return HttpResponse(json.dumps(information), content_type='application/json', charset='utf-8')
+    else:
+        return redirect("/login")
 
 def changeinfo(request):
     # 返回的信息
     information = {"result": "true", "information": "注册成功"}
+
     # 拿到提交的表单
     form = request.POST
-    # form = {
-    #         "First_Name":"Long",
-    #         "Last_Name" :"Qiwei",
-    #         "Chinese_Name" : "龙淇伟",
-    #         "Sex" : "f",
-    #         "Nationality" : "China",
-    #         "Date_Of_Birth" : "1998.8.15",
-    #         "Place_of_Birth" : "jiangxi jian",
-    #         "Mather_Tongue" : "Chinese",
-    #         "Religion" : "无",
-    #         "Health_Condition" : "Good",
-    #         "Name_Of_Institution" : "Beijing JiaoTong University",
-    #         "Highest_Education" : "phd",
-    #         "Email" : "1@qq.com",
-    #         "Phone_Number" : "18801119875",
-    #         "Emergency_Name" : "lalaal",
-    #         "Emergency_Relationship" : "lala",
-    #         "Emergency_Phone" : "ads",
-    #         "Emergency_email" : "adsd",
-    #         "Name_Of_Sponsor" : "guojiajijingwei",
-    #         "Sponsor_Relationship" : "sidjisd",
-    #         "Sponsor_Phone" : "sdfsf",
-    #         "Sponsor_Email" : "23r",
-    #         "Mail_Recipient" : "12323",
-    #         "Mail_Phone" : "123213",
-    #         "Mail_Address" : "1234324",
-    #         "Mail_City" : "12323132",
-    #         "Mail_Country" : "fdsfds",
-    #         "Mail_Postcode" :"123123",
-    #         }
 
     #获取当前的登录用户
     user = models.User.objects.get(email="1@qq.com")
@@ -192,3 +132,54 @@ def test_post(request):
         info = {}
         info["result"] = form["email"]
         return JsonResponse(info)
+
+def audit(request):
+    if request.user.is_authenticated and request.user.is_admin:
+        if request.method == "GET":
+            return render(request, "audit.html")
+    else:
+        return redirect("/login")
+
+def lookup(request):
+    if request.user.is_authenticated and request.user.is_admin:
+        if request.method == "GET":
+            return render(request,"lookup.html")
+    else:
+        return redirect("/login")
+
+def log_out(request):
+    if request.user.is_authenticated:
+        logout(request)
+        return redirect("/login")
+    else:
+        return redirect("/login")
+
+def forgot(request):
+    if request.method == "GET":
+        return render(request,"forgot.html")
+    if request.method == "POST":
+        email=request.POST["email"]
+
+        user = User.objects.get(email = email)
+        # 发送纯文本格式的邮件
+        text = "You password is:"+user.password
+        msg = MIMEText(text,'plain','utf-8')
+        #发送邮箱地址
+        sender = '13031170798@163.com'
+        #邮箱授权码，非登陆密码
+        password = 'zxc89473324'
+        #收件箱地址
+        receiver = email
+        #smtp服务器
+        smtp_server = 'smtp.163.com'
+        #发送邮箱地址
+        msg['From'] = sender
+        #收件箱地址
+        msg['To'] = receiver
+        #主题
+        msg['Subject'] = 'from IMYalost'
+        server = smtplib.SMTP(smtp_server,25)
+        server.login(sender,password)
+        server.sendmail(sender,receiver,msg.as_string())
+        server.quit()
+        return render(request,"login.html")

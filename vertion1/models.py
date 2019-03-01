@@ -42,8 +42,6 @@ class User(AbstractBaseUser):
     # email
     email = models.EmailField(unique=True)
 
-    password = models.CharField(max_length=30)
-
     objects = MyUserManager()
 
     # creation date
@@ -77,14 +75,18 @@ class User_info(models.Model):
     sex_list={('f','female'),
               ('m','male')}
 
-    email = models.ForeignKey(User,on_delete=models.CASCADE,default='')
+    user_email = models.EmailField(unique=True)
+
+    photo = models.ImageField(upload_to='user_photo/')
     First_Name = models.CharField(max_length=30,null = False,default = 'null')
     Last_Name = models.CharField(max_length=30,null = False,default = 'null')
     Chinese_Name = models.CharField(max_length=30,null=False,default = 'null')
     Sex = models.CharField(max_length=1,choices=sex_list,null = False,default = 'null')
     Nationality = models.CharField(max_length=30,null = False,default = 'null')
-    Date_Of_Birth = models.CharField(max_length = 30,null = False,default = 'null')
-    Place_of_Birth = models.CharField(max_length = 30,null = False,default = 'null')
+    Month = models.CharField(max_length=30,null = False,default = 'null')
+    Day =  models.CharField(max_length=30,null = False,default = 'null')
+    Year = models.CharField(max_length=30,null = False,default = 'null')
+    Place_Of_Birth = models.CharField(max_length = 30,null = False,default = 'null')
     Mather_Tongue = models.CharField(max_length=30, null=False,default = 'null')
     Religion = models.CharField(max_length=30, null=False,default = 'null')
     Health_Condition = models.CharField(max_length=100, null=False,default = 'null')
@@ -106,5 +108,9 @@ class User_info(models.Model):
     Mail_City = models.CharField(max_length=30, null=False,default = 'null')
     Mail_Country = models.CharField(max_length=30, null=False,default = 'null')
     Mail_Postcode = models.CharField(max_length=30, null=False,default = 'null')
+    Passport_Number = models.CharField(max_length=30, null=False, default='null')
+    Date_Of_Expriy = models.CharField(max_length=30, null=False, default='null')
+    Passport_Information_Page = models.ImageField("user_passport/")
+
     submit_status = models.CharField(max_length=30, null=False,default = 'null')
 
