@@ -87,6 +87,7 @@
               <!--PERSONAL INFORMATION-->
               <div class="col-8">
                 <form action="change?email={{ email }}" method="POST" class="card" enctype="multipart/form-data">
+                    {% csrf_token %}
                   <div class="card-header">
                       <h3 class="card-title">Please fill the information below according to your passport.</h3>
                     </div>

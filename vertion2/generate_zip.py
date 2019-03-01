@@ -11,6 +11,7 @@ def del_file(path):
             del_file(c_path)
         else:
             os.remove(c_path)
+            print("已经移除了："+c_path)
 
 def zipDir(dirpath,outFuilName):
     zip = zipfile.ZipFile(outFuilName,"w",zipfile.ZIP_DEFLATED)
@@ -25,7 +26,6 @@ def zipDir(dirpath,outFuilName):
 def get_zip(user):
     #获取主路径
     father_path = os.getcwd()
-    print(father_path)
 
     #获取导出的文件的路劲
     result_path = os.path.join(father_path, "result")
@@ -37,9 +37,8 @@ def get_zip(user):
     ls = os.listdir(result_path)
     for element in ls:
         path = os.path.join(result_path, element)
-        print(path)
         os.removedirs(path)
-    os.makedirs(result_path)
+    # os.makedirs(result_path)
 
     #获取Media 的路径
     static_path = os.path.join(father_path,"static")
@@ -49,7 +48,7 @@ def get_zip(user):
 
     #创建文件夹
     for element in user:
-        path = os.path.join(result_path,element["First_Name"]+" "+element["Last_Name"])
+        path = os.path.join(result_path,element["First_Name"]+" "+element["Last_Name"]+"_"+element["user_email"])
         os.makedirs(path)
         split1 = element["photo"].split(".")
         split2 = element["Passport_Information_Page"].split(".")
@@ -76,7 +75,6 @@ def get_zip(user):
 
     zip_path = os.path.join(father_path,"result.zip")
     zipDir(result_path,zip_path)
-
 
 
 

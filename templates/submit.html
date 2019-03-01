@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
@@ -89,7 +90,9 @@
             <div class="row">
               <!--PERSONAL INFORMATION-->
               <div class="col-8">
+
                 <form action="submit" method="POST" class="card" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <!--perdonnal information-->
                     <div class="card-header">
                   <h3 class="card-title">Please fill the information below according to your passport.</h3>
